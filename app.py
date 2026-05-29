@@ -264,7 +264,7 @@ def video_feed():
 
     return Response(gen(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-NODEMCU_IP = '192.168.100.53'
+NODEMCU_IP = '192.168.1.108'
 @app.route('/open_door')
 def open_door():
     # Send HTTP request to open the door

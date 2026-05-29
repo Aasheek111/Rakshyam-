@@ -7,16 +7,15 @@ const char* ssid = "Not Connected";  // Replace with your Wi-Fi SSID
 const char* password = "password111";  // Replace with your Wi-Fi password
 
 // Define the rows and columns of the keypad
-const byte ROW_NUM    = 4;     // four rows
+const byte ROW_NUM    = 3;     // four rows
 const byte COLUMN_NUM = 3;     // three columns
 char keys[ROW_NUM][COLUMN_NUM] = {
   {'1','2','3'},
   {'4','5','6'},
   {'7','8','9'},
-  {'*','0','#'}
 };
-byte pin_rows[ROW_NUM] = {D2, D3, D4, D5};  // Pinout for the rows
-byte pin_column[COLUMN_NUM] = {D6, D7, D8};  // Pinout for the columns
+byte pin_rows[ROW_NUM] = {D2, D3, D4};  // Pinout for the rows
+byte pin_column[COLUMN_NUM] = {D5,D6, D7};  // Pinout for the columns
 
 Keypad keypad = Keypad(makeKeymap(keys), pin_rows, pin_column, ROW_NUM, COLUMN_NUM);
 

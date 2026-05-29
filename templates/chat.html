@@ -1,79 +1,275 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Dashboard</title>
-    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
-    <style>
-        /* Styling for chat box */
-        #chat-box {
-            border: 1px solid #ccc;
-            padding: 10px;
-            width: 300px;
-            height: 400px;
-            overflow-y: scroll;
-            background-color: #f9f9f9;
-        }
-        .chat-message {
-            padding: 5px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-        }
-        .user-message {
-            background-color: #e0f7fa;
-            color: #00796b;
-        }
-        .system-message {
-            background-color: #f1f8e9;
-            color: #388e3c;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+
+    *, *::before, *::after {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 24px rgba(0,0,0,0.08);
+      padding: 32px;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-dot {
+      width: 22px;
+      height: 22px;
+      background: #111;
+      border-radius: 6px;
+    }
+
+    .brand-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #111;
+    }
+
+    .welcome {
+      font-size: 13px;
+      color: #888;
+    }
+
+    .welcome span {
+      font-weight: 600;
+      color: #111;
+    }
+
+    h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #111;
+      margin-bottom: 12px;
+    }
+
+    /* ── Chat box ── */
+    #chat-box {
+      height: 360px;
+      overflow-y: auto;
+      border: 1px solid #e8e8e8;
+      border-radius: 12px;
+      padding: 14px;
+      background: #fafafa;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 14px;
+      scroll-behavior: smooth;
+    }
+
+    #chat-box::-webkit-scrollbar { width: 4px; }
+    #chat-box::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+
+    .chat-message {
+      padding: 9px 13px;
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.5;
+      max-width: 85%;
+      word-break: break-word;
+    }
+
+    .user-message {
+      background: #111;
+      color: #fff;
+      align-self: flex-end;
+      border-bottom-right-radius: 3px;
+    }
+
+    .system-message {
+      background: #f0f2f5;
+      color: #444;
+      align-self: flex-start;
+      border-bottom-left-radius: 3px;
+    }
+
+    .msg-sender {
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 3px;
+      opacity: 0.6;
+    }
+
+    /* ── Input row ── */
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .input-row input {
+      flex: 1;
+      padding: 11px 14px;
+      font-family: inherit;
+      font-size: 14px;
+      color: #111;
+      background: #fafafa;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .input-row input:focus {
+      border-color: #999;
+      box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+      background: #fff;
+    }
+
+    .input-row input::placeholder { color: #bbb; }
+
+    .btn-send {
+      padding: 11px 20px;
+      background: #111;
+      color: #fff;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+      white-space: nowrap;
+    }
+
+    .btn-send:hover { background: #333; }
+    .btn-send:active { transform: scale(0.98); }
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center;
+      color: #bbb;
+      font-size: 13px;
+      margin: auto;
+    }
+
+  </style>
 </head>
 <body>
-    <h1>Welcome, {{ username }}</h1>
 
-    <h2>Chat</h2>
-    <!-- Chat Box Section -->
-    <div id="chat-box">
-        <!-- Past chat messages will appear here -->
-        {% for message in chat_history %}
-            <div class="chat-message system-message">{{ message }}</div>
-        {% endfor %}
+<div class="card">
+
+  <div class="header">
+    <div class="brand">
+      <div class="brand-dot"></div>
+      <span class="brand-name">Dashboard</span>
     </div>
-    <input type="text" id="message" placeholder="Type a message" style="width: 80%;">
-    <button onclick="sendMessage()">Send</button>
+    <span class="welcome">Logged in as <span>{{ username }}</span></span>
+  </div>
 
-    <script>
-        var socket = io.connect('http://' + document.domain + ':' + location.port);
+  <h2>Chat</h2>
 
-        // Listen for incoming messages
-        socket.on('message', function(data) {
-            var chatBox = document.getElementById("chat-box");
-            var messageElement = document.createElement("div");
-            
-            // Add a different color based on message type (user or system)
-            if (data.type === 'user') {
-                messageElement.className = "chat-message user-message";
-            } else {
-                messageElement.className = "chat-message system-message";
-            }
-            
-            messageElement.innerText = data.username + ": " + data.message;
-            chatBox.appendChild(messageElement);
+  <div id="chat-box">
+    {% if chat_history %}
+      {% for message in chat_history %}
+        <div class="chat-message system-message">
+          <div class="msg-sender">System</div>
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state" id="empty-state">No messages yet. Say hello 👋</div>
+    {% endif %}
+  </div>
 
-            // Scroll to the bottom of the chat box
-            chatBox.scrollTop = chatBox.scrollHeight;
-        });
+  <div class="input-row">
+    <input type="text" id="message" placeholder="Type a message..." autocomplete="off">
+    <button class="btn-send" onclick="sendMessage()">Send</button>
+  </div>
 
-        // Send message function
-        function sendMessage() {
-            var message = document.getElementById("message").value;
-            if (message.trim()) {
-                // Send the message with the username and type 'user'
-                socket.emit('user-message', { message: message, username: "{{ username }}" });
-                document.getElementById("message").value = ''; // Clear the input field
-            }
-        }
-    </script>
+</div>
+
+<script>
+  const USERNAME = "{{ username }}";
+
+  const socket = io.connect('http://' + document.domain + ':' + location.port);
+
+  // Listen for incoming messages
+  socket.on('message', function(data) {
+    removeEmptyState();
+
+    const chatBox = document.getElementById("chat-box");
+    const wrapper = document.createElement("div");
+
+    if (data.type === 'user') {
+      wrapper.className = "chat-message user-message";
+    } else {
+      wrapper.className = "chat-message system-message";
+    }
+
+    const sender = document.createElement("div");
+    sender.className = "msg-sender";
+    sender.innerText = data.username;
+
+    const text = document.createElement("div");
+    text.innerText = data.message;
+
+    wrapper.appendChild(sender);
+    wrapper.appendChild(text);
+    chatBox.appendChild(wrapper);
+
+    // Auto-scroll to latest message
+    chatBox.scrollTop = chatBox.scrollHeight;
+  });
+
+  // Send message on button click
+  function sendMessage() {
+    const input = document.getElementById("message");
+    const message = input.value.trim();
+
+    if (message) {
+      socket.emit('user-message', {
+        message: message,
+        username: USERNAME
+      });
+      input.value = '';
+      input.focus();
+    }
+  }
+
+  // Send message on Enter key
+  document.getElementById("message").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") sendMessage();
+  });
+
+  // Remove empty state placeholder once messages arrive
+  function removeEmptyState() {
+    const el = document.getElementById("empty-state");
+    if (el) el.remove();
+  }
+</script>
+
 </body>
 </html>
