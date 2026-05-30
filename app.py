@@ -288,7 +288,7 @@ def door_status():
 def logout():
     session.pop('username', None)
     print("User logged out.")
-    return redirect(url_for('login'))
+    return redirect(url_for('login')) 
 
 @socketio.on('user-message')
 def handle_user_message(message):
