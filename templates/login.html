@@ -379,13 +379,18 @@
 <body>
 
 <!-- Left decorative panel -->
+<!-- Left decorative panel -->
 <div class="panel-left">
-  <div class="panel-brand">
-    <div class="panel-brand-mark">
-      <svg viewBox="0 0 14 14"><path d="M2 7l3.5 3.5L12 3" stroke="none" fill="#fff" stroke-width="0"/><path d="M2 7l3.5 3.5L12 3" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </div>
-    <span class="panel-brand-name">Rakshyam</span>
+ <div class="panel-brand">
+  <div class="panel-brand-mark">
+    <img src="{{ url_for('static', filename='logo.png') }}" 
+         alt="Rakshyam Logo" 
+         width="20" 
+         height="20"
+         style="object-fit: contain; border-radius: 4px;">
   </div>
+  <span class="panel-brand-name">Rakshyam</span>
+</div>
 
   <div class="panel-copy">
     <h1>Good to have<br>you <span>back.</span></h1>

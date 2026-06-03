@@ -9,6 +9,7 @@ from flask_mail import Mail, Message
 from flask_socketio import SocketIO, send
 import pandas as pd
 
+
 app = Flask(__name__)
 
 # Email Configuration

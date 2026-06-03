@@ -2,43 +2,57 @@
 #include <ESP8266HTTPClient.h>
 #include <Keypad.h>
 #include <Servo.h>
+#include <DHT.h>
 
-const char* ssid = "Not Connected";  // Replace with your Wi-Fi SSID
-const char* password = "password111";  // Replace with your Wi-Fi password
+const char* ssid = "Connecting";
+const char* password = "netkopassword";
 
-// Define the rows and columns of the keypad
-const byte ROW_NUM    = 3;     // four rows
-const byte COLUMN_NUM = 3;     // three columns
+#define PIR_PIN D0
+#define DHT_PIN D3
+#define DHTTYPE DHT11
+DHT dht(DHT_PIN, DHTTYPE);
+
+const byte ROW_NUM    = 4;
+const byte COLUMN_NUM = 3;
 char keys[ROW_NUM][COLUMN_NUM] = {
   {'1','2','3'},
   {'4','5','6'},
-  {'7','8','9'},
+  {'7','8','9'}
 };
-byte pin_rows[ROW_NUM] = {D2, D3, D4};  // Pinout for the rows
-byte pin_column[COLUMN_NUM] = {D5,D6, D7};  // Pinout for the columns
+byte pin_rows[ROW_NUM]      = {D3, D4, D5};
+byte pin_column[COLUMN_NUM] = {D6, D7, D8};
 
 Keypad keypad = Keypad(makeKeymap(keys), pin_rows, pin_column, ROW_NUM, COLUMN_NUM);
 
 int count = 0;
-const int pirPin = D0;                  // PIR sensor pin
-const int servoPin = D1;                // Servo pin
-const String pass = "1234";             // Password for keypad
+const int servoPin  = D1;
+const String pass   = "1234";
 Servo myServo;
 
 WiFiServer server(80);
 
 bool isDoorOpen = false;
-unsigned long lastMotionTime = 0;       // Last motion detection time
-const unsigned long motionCooldown = 5000; // 5 seconds cooldown
+
+unsigned long lastMotionTime = 0;
+const unsigned long motionCooldown = 5000;
+
+unsigned long lastDHTTime = 0;
+const unsigned long dhtInterval = 2000;   // Read DHT every 2 seconds
+
+float temperature = 0.0;
+float humidity    = 0.0;
+
+String pressedpass = "";
 
 void setup() {
   Serial.begin(115200);
 
-  // Initialize the keypad
+  pinMode(PIR_PIN, INPUT);
+  dht.begin();
+
   myServo.attach(servoPin);
-  myServo.write(0);  // Initially set the servo to closed (0 degrees)
-  
-  // Setup Wi-Fi connection
+  myServo.write(0);
+
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
@@ -47,26 +61,40 @@ void setup() {
   Serial.println("Connected to WiFi");
   Serial.println(WiFi.localIP());
 
-  server.begin();  // Start the server to listen for requests
-  
-  pinMode(pirPin, INPUT);  // Initialize PIR sensor pin
+  server.begin();
 }
 
-String pressedpass = "";
-
 void loop() {
-  // Keypad check for button press
+
+  // ── 1. DHT READ (non-blocking, every 2 seconds) ──────────────────────────
+  if (millis() - lastDHTTime > dhtInterval) {
+    lastDHTTime = millis();
+
+    float t = dht.readTemperature();
+    float h = dht.readHumidity();
+
+    if (isnan(t) || isnan(h)) {
+      Serial.println("Failed to read from DHT sensor!");
+    } else {
+      temperature = t;
+      humidity    = h;
+      Serial.print("Temperature: "); Serial.print(temperature); Serial.print(" °C");
+      Serial.print(" | Humidity: ");  Serial.print(humidity);    Serial.println(" %");
+    }
+  }
+
+  // ── 2. KEYPAD (always active, NOT inside PIR block) ──────────────────────
   char key = keypad.getKey();
   if (key) {
     Serial.println(key);
-    
-    count += 1;
+    count++;
     pressedpass += key;
-    
-    if(count == 4) {
-      if(pass == pressedpass) {
-        myServo.write(180);  // Open the door (servo to 180 degrees)
-        Serial.println("Door opened");
+
+    if (count == 4) {
+      if (pass == pressedpass) {
+        myServo.write(180);
+        isDoorOpen = true;
+        Serial.println("Door opened via keypad");
       } else {
         Serial.println("Incorrect password");
       }
@@ -75,17 +103,16 @@ void loop() {
     }
   }
 
-  // Motion detection logic
-  if (digitalRead(pirPin) == HIGH && millis() - lastMotionTime > motionCooldown) {
-    lastMotionTime = millis();  // Update the last motion time
+  // ── 3. PIR MOTION DETECTION ───────────────────────────────────────────────
+  if (digitalRead(PIR_PIN) == HIGH && millis() - lastMotionTime > motionCooldown) {
+    lastMotionTime = millis();
     Serial.println("Motion detected!");
-    
-    // Send HTTP request to capture image
+
     if (WiFi.status() == WL_CONNECTED) {
-      WiFiClient client;
+      WiFiClient httpClient;
       HTTPClient http;
-      String serverUrl = "http://127.0.0.1:5000/captures"; // Flask server URL - update to match your Flask server's IP
-      http.begin(client, serverUrl);
+      String serverUrl = "http://127.0.0.1:5000/captures";
+      http.begin(httpClient, serverUrl);
       int httpResponseCode = http.GET();
       if (httpResponseCode == 200) {
         Serial.println("Image capture triggered successfully.");
@@ -99,24 +126,34 @@ void loop() {
     }
   }
 
-  // Handle incoming client requests for opening/closing the door (servo control)
+  // ── 4. HTTP SERVER (open / close / dht) ──────────────────────────────────
   WiFiClient client = server.available();
   if (client) {
     String request = client.readStringUntil('\r');
     client.flush();
-    
+
     if (request.indexOf("/open") != -1) {
-      myServo.write(180);  // Open the door (servo to 180 degrees)
+      myServo.write(180);
       isDoorOpen = true;
+      Serial.println("Open request received");
       client.println("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nDoor opened");
+
     } else if (request.indexOf("/close") != -1) {
-      myServo.write(0);   // Close the door (servo to 0 degrees)
+      myServo.write(0);
       isDoorOpen = false;
+      Serial.println("Close request received");
       client.println("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nDoor closed");
+
+    } else if (request.indexOf("/dht") != -1) {
+      String body = "Temperature: " + String(temperature, 1) + " C, Humidity: " + String(humidity, 1) + " %";
+      client.println("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n" + body);
+      Serial.println("DHT data sent: " + body);
+
     } else {
       client.println("HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\nInvalid command");
     }
+
     delay(10);
-    client.stop();  // Close the connection after responding
+    client.stop();
   }
 }
