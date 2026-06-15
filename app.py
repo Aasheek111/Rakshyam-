@@ -8,17 +8,18 @@ import numpy as np
 from flask_mail import Mail, Message
 from flask_socketio import SocketIO, send
 import pandas as pd
+from dotenv import load_dotenv
 
-
+load_dotenv();
 app = Flask(__name__)
 
 # Email Configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_SSL'] = True
-app.config['MAIL_USERNAME'] = 'subscribegateway111@gmail.com'  # Replace with your email
-app.config['MAIL_PASSWORD'] = 'cmdx xzeu csmk vfxh'  # Replace with your app-specific password
-app.config['MAIL_DEFAULT_SENDER'] = 'subscribegateway111@gmail.com'  # Replace with your email
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')  
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD') 
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')  
 
 # Initialize SocketIO and Flask-Mail
 socketio = SocketIO(app)
