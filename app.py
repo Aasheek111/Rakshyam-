@@ -40,11 +40,10 @@ def env_int(name, default):
 
 
 # Email configuration. Gmail requires an app password, not the normal account password.
-mail_use_tls = env_bool("MAIL_USE_TLS", False)
 app.config["MAIL_SERVER"] = os.getenv("MAIL_SERVER", "smtp.gmail.com")
 app.config["MAIL_PORT"] = env_int("MAIL_PORT", 465)
-app.config["MAIL_USE_TLS"] = mail_use_tls
-app.config["MAIL_USE_SSL"] = env_bool("MAIL_USE_SSL", not mail_use_tls)
+app.config["MAIL_USE_SSL"] = env_bool("MAIL_USE_SSL", True)
+app.config["MAIL_USE_TLS"] = env_bool("MAIL_USE_TLS", False)
 app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
 app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
 app.config["MAIL_DEFAULT_SENDER"] = os.getenv("MAIL_DEFAULT_SENDER") or os.getenv("MAIL_USERNAME")
@@ -63,7 +62,7 @@ DOOR_UNLOCK_COOLDOWN_SECONDS = env_int("DOOR_UNLOCK_COOLDOWN_SECONDS", 10)
 DOOR_REQUEST_TIMEOUT_SECONDS = env_int("DOOR_REQUEST_TIMEOUT_SECONDS", 3)
 DOOR_CONTROLLER_URL = os.getenv(
     "DOOR_CONTROLLER_URL",
-    f"http://{os.getenv('NODEMCU_IP', '192.168.1.108')}",
+    f"http://{os.getenv('NODEMCU_IP', '192.168.1.85')}",
 ).rstrip("/")
 
 os.makedirs(CAPTURES_DIR, exist_ok=True)
@@ -551,9 +550,4 @@ def handle_message(data):
 
 
 if __name__ == "__main__":
-    socketio.run(
-        app,
-        host=os.getenv("FLASK_HOST", "127.0.0.1"),
-        port=env_int("FLASK_PORT", 5000),
-        debug=True,
-    )
+    socketio.run(app, debug=True)
