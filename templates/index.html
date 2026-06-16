@@ -3,22 +3,26 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Smart Door Control</title>
+<title>Rakshyam Door Control</title>
+<script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@500&display=swap" rel="stylesheet">
 <style>
 
 :root {
-  --bg:        #080c12;
-  --surface:   #0e1520;
-  --surface2:  #141d2b;
-  --border:    rgba(255,255,255,0.07);
-  --accent:    #555;;
+  --bg:        #f7f6f3;
+  --ink:       #0e0e0e;
+  --surface:   #ffffff;
+  --surface2:  #f0ede8;
+  --border:    #e5e2dc;
+  --border-strong: #ccc9c2;
+  --accent:    #c8a96e;
+  --accent-dark: #a8874e;
   --green:     #239e2f;
-  --red:       #a90425;
-  --text:      #e2e8f0;
-  --muted:     #4a5a70;
-  --mono:      'Space Mono', monospace;
+  --red:       #c0392b;
+  --text:      #0e0e0e;
+  --muted:     #77716a;
+  --mono:      'DM Sans', sans-serif;
   --sans:      'DM Sans', sans-serif;
 }
 
@@ -31,8 +35,9 @@ body {
   min-height: 100vh;
   padding: 28px 24px;
   background-image:
-    radial-gradient(ellipse 60% 40% at 70% 0%, rgba(0,229,255,0.05) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 30% at 10% 80%, rgba(0,230,118,0.04) 0%, transparent 50%);
+    linear-gradient(rgba(200,169,110,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,169,110,0.06) 1px, transparent 1px);
+  background-size: 42px 42px;
 }
 
 .container {
@@ -46,8 +51,11 @@ body {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 32px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--border);
+  padding: 20px 22px;
+  background: var(--ink);
+  border: 1px solid rgba(200,169,110,0.18);
+  border-radius: 8px;
+  box-shadow: 0 16px 40px rgba(14,14,14,0.08);
 }
 
 .header-left {
@@ -59,26 +67,26 @@ body {
 .logo-icon {
   width: 38px;
   height: 38px;
-  border: 2px solid var(--accent);
-  border-radius: 10px;
+  background: var(--accent);
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.logo-icon svg { width: 18px; height: 18px; color: var(--accent); }
+.logo-icon svg { width: 18px; height: 18px; color: #fff; }
 
 .header h1 {
-  font-family: var(--mono);
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: -0.02em;
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  font-weight: 500;
+  color: #fff;
+  letter-spacing: 0;
 }
 
 .header p {
   font-size: 12px;
-  color: var(--muted);
+  color: rgba(255,255,255,0.55);
   margin-top: 2px;
 }
 
@@ -86,12 +94,13 @@ body {
   display: flex;
   align-items: center;
   gap: 7px;
-  background: rgba(0,230,118,0.1);
-  border: 1px solid rgba(0,230,118,0.2);
+  background: rgba(35,158,47,0.12);
+  border: 1px solid rgba(35,158,47,0.25);
   border-radius: 20px;
   padding: 6px 14px;
   font-size: 12px;
-  font-family: var(--mono);
+  font-family: var(--sans);
+  font-weight: 600;
   color: var(--green);
 }
 
@@ -119,17 +128,18 @@ body {
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 8px;
   padding: 24px;
   overflow: hidden;
+  box-shadow: 0 14px 34px rgba(14,14,14,0.06);
 }
 
 .card-title {
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--muted);
-  letter-spacing: .1em;
+  letter-spacing: .06em;
   text-transform: uppercase;
   margin-bottom: 18px;
   display: flex;
@@ -148,9 +158,9 @@ body {
 /* ── Video feed ── */
 .video-wrap {
   position: relative;
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
-  background: var(--surface2);
+  background: #111;
   aspect-ratio: 16/9;
 }
 
@@ -186,7 +196,8 @@ body {
   top: 12px;
   left: 50%;
   transform: translateX(-50%);
-  font-family: var(--mono);
+  font-family: var(--sans);
+  font-weight: 600;
   font-size: 10px;
   color: var(--accent);
   opacity: 0.7;
@@ -200,7 +211,7 @@ body {
   justify-content: space-between;
   background: var(--surface2);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 14px 18px;
   margin-top: 16px;
 }
@@ -208,12 +219,13 @@ body {
 .status-label {
   font-size: 12px;
   color: var(--muted);
-  font-family: var(--mono);
+  font-family: var(--sans);
+  font-weight: 600;
   letter-spacing: .06em;
 }
 
 .status-value {
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 14px;
   font-weight: 700;
   transition: color .3s;
@@ -243,8 +255,8 @@ body {
 .btn {
   padding: 14px;
   border: none;
-  border-radius: 10px;
-  font-family: var(--mono);
+  border-radius: 8px;
+  font-family: var(--sans);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -260,15 +272,15 @@ body {
 .btn:active  { transform: scale(.98); }
 
 .btn-open {
-  background: var(--green);
-  color: #000;
-  box-shadow: 0 4px 20px rgba(0,230,118,0.25);
+  background: var(--ink);
+  color: #fff;
+  box-shadow: 0 4px 18px rgba(14,14,14,0.15);
 }
 
 .btn-close {
   background: var(--red);
   color: #fff;
-  box-shadow: 0 4px 20px rgba(255,23,68,0.25);
+  box-shadow: 0 4px 18px rgba(192,57,43,0.18);
 }
 
 /* ── Right column ── */
@@ -288,12 +300,12 @@ body {
 .stat {
   background: var(--surface2);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 14px;
 }
 
 .stat-val {
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 22px;
   font-weight: 700;
   color: var(--accent);
@@ -318,7 +330,7 @@ body {
   overflow-y: auto;
   background: var(--surface2);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 14px;
   margin-bottom: 12px;
   display: flex;
@@ -347,16 +359,16 @@ body {
 }
 
 .msg-system {
-  background: rgba(0,229,255,0.08);
-  border: 1px solid rgba(0,229,255,0.12);
+  background: #fff;
+  border: 1px solid var(--border);
   color: var(--text);
   align-self: flex-start;
 }
 
 .msg-user {
-  background: rgba(255,255,255,0.07);
-  border: 1px solid var(--border);
-  color: var(--text);
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  color: #fff;
   align-self: flex-end;
 }
 
@@ -364,8 +376,11 @@ body {
   font-size: 10px;
   color: var(--muted);
   margin-top: 3px;
-  font-family: var(--mono);
+  font-family: var(--sans);
+  font-weight: 600;
 }
+
+.msg-user .msg-time { color: rgba(255,255,255,0.58); }
 
 .chat-input-row {
   display: flex;
@@ -385,16 +400,16 @@ body {
   transition: border-color .2s;
 }
 
-.chat-input:focus { border-color: rgba(0,229,255,0.4); }
+.chat-input:focus { border-color: var(--accent); }
 .chat-input::placeholder { color: var(--muted); }
 
 .btn-send {
   padding: 11px 18px;
   background: var(--accent);
-  color: #000;
+  color: var(--ink);
   border: none;
   border-radius: 8px;
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
@@ -410,7 +425,7 @@ body {
 .log {
   background: var(--surface2);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 14px;
   max-height: 130px;
   overflow-y: auto;
@@ -432,7 +447,8 @@ body {
 .log-entry:last-child { border-bottom: none; }
 
 .log-time {
-  font-family: var(--mono);
+  font-family: var(--sans);
+  font-weight: 600;
   color: var(--muted);
   font-size: 10px;
   white-space: nowrap;
@@ -582,7 +598,8 @@ body {
 </div>
 
 <script>
-  const DOOR_IP = "http://192.168.1.108";
+  const USERNAME = {{ username|tojson }};
+  const socket = window.io ? io() : null;
 
   let doorEvents = 0;
   let messageCount = 0;
@@ -602,8 +619,39 @@ body {
   // ── Set init time ──
   window.addEventListener('DOMContentLoaded', () => {
     document.getElementById("init-time").textContent = nowTime();
-    closeDoor();
+    addLog("System ready", "var(--accent)");
   });
+
+  if (socket) {
+    socket.on("message", data => {
+      appendMessage(data.message, data.type === "user" ? "user" : "system", data.username || "System");
+      messageCount++;
+      document.getElementById("stat-msgs").textContent = messageCount;
+    });
+
+    socket.on("door-event", data => {
+      if (data.status === "open") {
+        setDoorStatus(true);
+        bumpDoorEvents();
+        addLog(data.message || "Door opened", "var(--green)");
+      } else if (data.status === "closed") {
+        setDoorStatus(false);
+        bumpDoorEvents();
+        addLog(data.message || "Door closed", "var(--red)");
+      } else {
+        addLog(data.message || "Door action failed", "var(--red)");
+      }
+    });
+
+    socket.on("security-alert", data => {
+      addLog(data.message || "Security alert", "var(--red)");
+    });
+
+    socket.on("attendance-event", data => {
+      const color = data.Status === "Known" ? "var(--green)" : "var(--red)";
+      addLog(`${data.Name} marked ${data.Status}`, color);
+    });
+  }
 
   function nowTime() {
     return new Date().toLocaleTimeString('en-US', { hour12: false });
@@ -624,32 +672,62 @@ body {
     }
   }
 
-  function openDoor() {
-    new Image().src = DOOR_IP + "/open";
-    setDoorStatus(true);
+  function bumpDoorEvents() {
     doorEvents++;
     document.getElementById("stat-events").textContent = doorEvents;
-    addLog("Door opened", "var(--green)");
+  }
+
+  async function sendDoorRequest(url, isOpen, successText) {
+    try {
+      const response = await fetch(url);
+      let data = {};
+      try {
+        data = await response.json();
+      } catch (e) {
+        data = {};
+      }
+
+      if (!response.ok || data.ok === false) {
+        throw new Error(data.detail || data.status || "Request failed");
+      }
+
+      if (!socket || !socket.connected) {
+        setDoorStatus(isOpen);
+        bumpDoorEvents();
+        addLog(successText, isOpen ? "var(--green)" : "var(--red)");
+      }
+    } catch (error) {
+      addLog(`${successText} failed`, "var(--red)");
+    }
+  }
+
+  function openDoor() {
+    sendDoorRequest("/open_door", true, "Door opened");
   }
 
   function closeDoor() {
-    new Image().src = DOOR_IP + "/close";
-    setDoorStatus(false);
-    doorEvents++;
-    document.getElementById("stat-events").textContent = doorEvents;
-    addLog("Door closed", "var(--red)");
+    sendDoorRequest("/close_door", false, "Door closed");
   }
 
   // ── Activity log ──
   function addLog(text, color) {
     const log = document.getElementById("activity-log");
     const entry = document.createElement("div");
+    const dot = document.createElement("span");
+    const time = document.createElement("span");
+    const label = document.createElement("span");
+
     entry.className = "log-entry";
-    entry.innerHTML = `
-      <span class="log-dot" style="background:${color}"></span>
-      <span class="log-time">${nowTime()}</span>
-      <span class="log-text">${text}</span>
-    `;
+    dot.className = "log-dot";
+    dot.style.background = color;
+    time.className = "log-time";
+    time.textContent = nowTime();
+    label.className = "log-text";
+    label.textContent = text;
+
+    entry.appendChild(dot);
+    entry.appendChild(time);
+    entry.appendChild(label);
     log.appendChild(entry);
     log.scrollTop = log.scrollHeight;
   }
@@ -660,18 +738,27 @@ body {
     const msg   = input.value.trim();
     if (!msg) return;
 
-    appendMessage(msg, "user");
     input.value = "";
-    messageCount++;
-    document.getElementById("stat-msgs").textContent = messageCount;
-    addLog(`Message: "${msg.slice(0,30)}${msg.length>30?'…':''}"`, "var(--accent)");
+    if (socket && socket.connected) {
+      socket.emit("user-message", { message: msg, username: USERNAME });
+    } else {
+      appendMessage(msg, "user", "You");
+      messageCount++;
+      document.getElementById("stat-msgs").textContent = messageCount;
+    }
+    addLog(`Message: "${msg.slice(0,30)}${msg.length>30?'...':''}"`, "var(--accent)");
   }
 
-  function appendMessage(text, type) {
+  function appendMessage(text, type, sender) {
     const box = document.getElementById("chat-box");
     const div = document.createElement("div");
+    const meta = document.createElement("div");
+
     div.className = type === "user" ? "msg msg-user" : "msg msg-system";
-    div.innerHTML = `${text}<div class="msg-time">${type === "user" ? "You" : "System"} · ${nowTime()}</div>`;
+    div.appendChild(document.createTextNode(text));
+    meta.className = "msg-time";
+    meta.textContent = `${sender || (type === "user" ? "You" : "System")} - ${nowTime()}`;
+    div.appendChild(meta);
     box.appendChild(div);
     box.scrollTop = box.scrollHeight;
   }

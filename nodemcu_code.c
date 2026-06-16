@@ -111,7 +111,9 @@ void loop() {
     if (WiFi.status() == WL_CONNECTED) {
       WiFiClient httpClient;
       HTTPClient http;
-      String serverUrl = "http://127.0.0.1:5000/captures";
+      // Replace YOUR_PC_IP with the laptop/PC IP running Flask.
+      // A NodeMCU cannot use 127.0.0.1 to reach the Flask server.
+      String serverUrl = "http://YOUR_PC_IP:5000/captures";
       http.begin(httpClient, serverUrl);
       int httpResponseCode = http.GET();
       if (httpResponseCode == 200) {
