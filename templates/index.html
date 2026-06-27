@@ -3,35 +3,27 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Rakshyam</title>
+<title>Rakshyam Door Control</title>
 <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@500&display=swap" rel="stylesheet">
 <style>
 
 :root {
-  --bg:         #0c0c0e;
-  --surface:    #141416;
-  --surface2:   #1c1c1f;
-  --surface3:   #242428;
-  --border:     rgba(255,255,255,0.07);
-  --border-md:  rgba(255,255,255,0.12);
-  --gold:       #c8a55e;
-  --gold-dim:   rgba(200,165,94,0.15);
-  --gold-glow:  rgba(200,165,94,0.08);
-  --green:      #3fb950;
-  --green-dim:  rgba(63,185,80,0.12);
-  --red:        #f85149;
-  --red-dim:    rgba(248,81,73,0.12);
-  --blue:       #58a6ff;
-  --blue-dim:   rgba(88,166,255,0.12);
-  --amber:      #e3b341;
-  --amber-dim:  rgba(227,179,65,0.12);
-  --text:       #e6e6e6;
-  --muted:      #6e7681;
-  --muted2:     #484f58;
-  --mono:       'DM Mono', monospace;
-  --sans:       'DM Sans', sans-serif;
+  --bg:        #f7f6f3;
+  --ink:       #0e0e0e;
+  --surface:   #ffffff;
+  --surface2:  #f0ede8;
+  --border:    #e5e2dc;
+  --border-strong: #ccc9c2;
+  --accent:    #c8a96e;
+  --accent-dark: #a8874e;
+  --green:     #239e2f;
+  --red:       #c0392b;
+  --text:      #0e0e0e;
+  --muted:     #77716a;
+  --mono:      'DM Sans', sans-serif;
+  --sans:      'DM Sans', sans-serif;
 }
 
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
@@ -41,18 +33,16 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
-  padding: 20px;
-  font-size: 14px;
+  padding: 28px 24px;
+  background-image:
+    linear-gradient(rgba(200,169,110,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,169,110,0.06) 1px, transparent 1px);
+  background-size: 42px 42px;
 }
 
-/* ── Grid layout ── */
-.layout {
-  max-width: 1400px;
+.container {
+  max-width: 1360px;
   margin: auto;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  gap: 14px;
-  min-height: calc(100vh - 40px);
 }
 
 /* ── Header ── */
@@ -60,154 +50,117 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 20px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  margin-bottom: 32px;
+  padding: 20px 22px;
+  background: var(--ink);
+  border: 1px solid rgba(200,169,110,0.18);
+  border-radius: 8px;
+  box-shadow: 0 16px 40px rgba(14,14,14,0.08);
 }
 
-.brand {
+.header-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
-.brand-icon {
-  width: 36px;
-  height: 36px;
-  background: var(--gold-dim);
-  border: 1px solid rgba(200,165,94,0.3);
+.logo-icon {
+  width: 38px;
+  height: 38px;
+  background: var(--accent);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
 }
 
-.brand-name {
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
+.logo-icon svg { width: 18px; height: 18px; color: #fff; }
+
+.header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  font-weight: 500;
   color: #fff;
+  letter-spacing: 0;
 }
 
-.brand-sub {
-  font-size: 11px;
-  color: var(--muted);
-  margin-top: 1px;
+.header p {
+  font-size: 12px;
+  color: rgba(255,255,255,0.55);
+  margin-top: 2px;
 }
 
-.header-right {
+.live-badge {
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-
-.chip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
+  gap: 7px;
+  background: rgba(35,158,47,0.12);
+  border: 1px solid rgba(35,158,47,0.25);
   border-radius: 20px;
-  font-size: 11px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-family: var(--sans);
   font-weight: 600;
-  letter-spacing: 0.05em;
-}
-
-.chip-live {
-  background: var(--green-dim);
-  border: 1px solid rgba(63,185,80,0.2);
   color: var(--green);
 }
 
-.chip-wifi {
-  background: var(--blue-dim);
-  border: 1px solid rgba(88,166,255,0.2);
-  color: var(--blue);
-}
-
-.chip-offline {
-  background: var(--red-dim);
-  border: 1px solid rgba(248,81,73,0.2);
-  color: var(--red);
-}
-
-.dot {
-  width: 6px;
-  height: 6px;
+.live-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--green);
   border-radius: 50%;
-  background: currentColor;
+  animation: pulse 1.5s infinite;
 }
-
-.dot-pulse { animation: pulse 1.8s ease-in-out infinite; }
 
 @keyframes pulse {
-  0%,100% { opacity:1; }
-  50%      { opacity:0.35; }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.8); }
 }
 
-.logout-btn {
-  padding: 6px 14px;
-  background: transparent;
-  border: 1px solid var(--border-md);
-  border-radius: 8px;
-  color: var(--muted);
-  font-family: var(--sans);
-  font-size: 12px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: border-color 0.2s, color 0.2s;
-}
-.logout-btn:hover { border-color: var(--gold); color: var(--gold); }
-
-/* ── Main grid ── */
-.main {
+/* ── Grid ── */
+.grid {
   display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 14px;
+  grid-template-columns: 1fr 380px;
+  gap: 20px;
 }
 
 /* ── Card ── */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 18px;
+  border-radius: 8px;
+  padding: 24px;
+  overflow: hidden;
+  box-shadow: 0 14px 34px rgba(14,14,14,0.06);
 }
 
-.card-label {
-  font-size: 10px;
+.card-title {
+  font-family: var(--sans);
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 14px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin-bottom: 18px;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.card-label::before {
+.card-title::before {
   content: '';
-  width: 2px;
-  height: 12px;
-  background: var(--gold);
+  width: 3px;
+  height: 14px;
+  background: var(--accent);
   border-radius: 2px;
 }
 
-/* ── Left column ── */
-.left-col {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-/* ── Video ── */
-.video-card { padding: 0; overflow: hidden; }
-
+/* ── Video feed ── */
 .video-wrap {
   position: relative;
-  background: #080808;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #111;
   aspect-ratio: 16/9;
 }
 
@@ -218,225 +171,144 @@ body {
   display: block;
 }
 
-.video-hud {
+.video-overlay {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
 
-.hud-corner {
+/* corner brackets */
+.corner {
   position: absolute;
-  width: 18px;
-  height: 18px;
-  border-color: var(--gold);
+  width: 20px;
+  height: 20px;
+  border-color: var(--accent);
   border-style: solid;
-  opacity: 0.5;
+  opacity: 0.6;
 }
-.hud-corner.tl { top:10px; left:10px;  border-width:1.5px 0 0 1.5px; }
-.hud-corner.tr { top:10px; right:10px; border-width:1.5px 1.5px 0 0; }
-.hud-corner.bl { bottom:10px; left:10px;  border-width:0 0 1.5px 1.5px; }
-.hud-corner.br { bottom:10px; right:10px; border-width:0 1.5px 1.5px 0; }
+.corner-tl { top:10px; left:10px;  border-width:2px 0 0 2px; }
+.corner-tr { top:10px; right:10px; border-width:2px 2px 0 0; }
+.corner-bl { bottom:10px; left:10px;  border-width:0 0 2px 2px; }
+.corner-br { bottom:10px; right:10px; border-width:0 2px 2px 0; }
 
-.hud-label {
+.video-label {
   position: absolute;
   top: 12px;
   left: 50%;
   transform: translateX(-50%);
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.12em;
-  color: var(--gold);
-  opacity: 0.65;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 10px;
+  color: var(--accent);
+  opacity: 0.7;
+  letter-spacing: .12em;
 }
 
-.hud-rec {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-family: var(--mono);
-  font-size: 9px;
-  color: var(--red);
-  opacity: 0.8;
-}
-
-.video-footer {
-  padding: 14px 18px;
-  border-top: 1px solid var(--border);
+/* ── Status bar ── */
+.status-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-top: 16px;
 }
 
-.door-status-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.door-status-label { font-size: 11px; color: var(--muted); }
-
-.door-badge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  border-radius: 20px;
+.status-label {
   font-size: 12px;
+  color: var(--muted);
+  font-family: var(--sans);
   font-weight: 600;
-  font-family: var(--mono);
-  transition: all 0.3s;
+  letter-spacing: .06em;
 }
 
-.door-badge.open {
-  background: var(--green-dim);
-  border: 1px solid rgba(63,185,80,0.25);
-  color: var(--green);
+.status-value {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 700;
+  transition: color .3s;
 }
 
-.door-badge.closed {
-  background: var(--red-dim);
-  border: 1px solid rgba(248,81,73,0.25);
-  color: var(--red);
+.status-value.open  { color: var(--green); }
+.status-value.closed { color: var(--red); }
+
+.status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  transition: background .3s;
 }
 
+.status-indicator.open  { background: var(--green); box-shadow: 0 0 8px var(--green); }
+.status-indicator.closed { background: var(--red);   box-shadow: 0 0 8px var(--red); }
+
+/* ── Buttons ── */
 .btn-row {
-  display: flex;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
 }
 
 .btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
+  padding: 14px;
   border: none;
   border-radius: 8px;
   font-family: var(--sans);
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
   cursor: pointer;
-  letter-spacing: 0.04em;
-  transition: opacity 0.15s, transform 0.1s;
-}
-
-.btn:hover  { opacity: 0.85; }
-.btn:active { transform: scale(0.97); }
-
-.btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.btn-unlock {
-  background: var(--gold);
-  color: #0c0c0e;
-}
-
-.btn-lock {
-  background: var(--surface3);
-  border: 1px solid var(--border-md);
-  color: var(--text);
-}
-
-/* ── Sensor strip ── */
-.sensor-strip {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-
-.sensor-tile {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px;
+  transition: transform .15s, opacity .15s, box-shadow .15s;
+  letter-spacing: .04em;
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.sensor-icon {
-  font-size: 18px;
-  margin-bottom: 6px;
-}
-
-.sensor-val {
-  font-family: var(--mono);
-  font-size: 20px;
-  font-weight: 500;
-  color: var(--gold);
-  line-height: 1;
-}
-
-.sensor-unit {
-  font-size: 11px;
-  color: var(--muted);
-}
-
-.sensor-lbl {
-  font-size: 11px;
-  color: var(--muted);
-  margin-top: 2px;
-}
-
-/* ── Bulb control ── */
-.bulb-tile.on  .sensor-val { color: var(--amber); }
-.bulb-tile.off .sensor-val { color: var(--muted2); }
-
-.bulb-btn-row {
-  display: flex;
-  gap: 6px;
-  margin-top: 8px;
-}
-
-.btn-sm {
-  flex: 1;
-  padding: 6px 0;
-  font-size: 11px;
+  align-items: center;
   justify-content: center;
+  gap: 8px;
 }
 
-.btn-bulb-on {
-  background: var(--amber);
-  color: #0c0c0e;
+.btn:hover   { transform: translateY(-2px); opacity: .92; }
+.btn:active  { transform: scale(.98); }
+
+.btn-open {
+  background: var(--ink);
+  color: #fff;
+  box-shadow: 0 4px 18px rgba(14,14,14,0.15);
 }
 
-.btn-bulb-off {
-  background: var(--surface3);
-  border: 1px solid var(--border-md);
-  color: var(--text);
+.btn-close {
+  background: var(--red);
+  color: #fff;
+  box-shadow: 0 4px 18px rgba(192,57,43,0.18);
 }
 
 /* ── Right column ── */
 .right-col {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 20px;
 }
 
-/* ── Stats row ── */
-.stats-row {
+/* ── Stats ── */
+.stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
 
-.stat-tile {
+.stat {
   background: var(--surface2);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 14px;
 }
 
 .stat-val {
-  font-family: var(--mono);
-  font-size: 24px;
-  font-weight: 500;
-  color: var(--gold);
+  font-family: var(--sans);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
 }
 
 .stat-lbl {
@@ -445,114 +317,79 @@ body {
   margin-top: 4px;
 }
 
-/* ── Activity log ── */
-.log-scroll {
-  max-height: 160px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.log-scroll::-webkit-scrollbar { width: 2px; }
-.log-scroll::-webkit-scrollbar-thumb { background: var(--border-md); }
-
-.log-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 5px 0;
-  border-bottom: 1px solid var(--border);
-  animation: fadeIn 0.2s ease;
-}
-
-.log-row:last-child { border-bottom: none; }
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.log-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  margin-top: 5px;
-  flex-shrink: 0;
-}
-
-.log-time {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--muted);
-  white-space: nowrap;
-  margin-top: 1px;
-}
-
-.log-text {
-  font-size: 12px;
-  color: var(--text);
-  line-height: 1.4;
-}
-
 /* ── Chat ── */
 .chat-card {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
-.chat-msgs {
+.chat-messages {
   flex: 1;
   overflow-y: auto;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 12px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 200px;
-  margin-bottom: 12px;
-  padding-right: 4px;
+  max-height: 280px;
+  scroll-behavior: smooth;
 }
 
-.chat-msgs::-webkit-scrollbar { width: 2px; }
-.chat-msgs::-webkit-scrollbar-thumb { background: var(--border-md); }
+.chat-messages::-webkit-scrollbar { width: 3px; }
+.chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
 .msg {
-  padding: 8px 12px;
+  padding: 9px 12px;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.5;
-  max-width: 88%;
-  animation: fadeIn 0.2s ease;
+  max-width: 90%;
+  word-break: break-word;
+  animation: fadeUp .2s ease;
 }
 
-.msg-sys {
-  background: var(--surface2);
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(6px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.msg-system {
+  background: #fff;
   border: 1px solid var(--border);
   color: var(--text);
   align-self: flex-start;
 }
 
 .msg-user {
-  background: var(--gold-dim);
-  border: 1px solid rgba(200,165,94,0.2);
-  color: var(--text);
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  color: #fff;
   align-self: flex-end;
 }
 
-.msg-meta {
+.msg-time {
   font-size: 10px;
   color: var(--muted);
   margin-top: 3px;
+  font-family: var(--sans);
+  font-weight: 600;
 }
 
-.chat-row {
+.msg-user .msg-time { color: rgba(255,255,255,0.58); }
+
+.chat-input-row {
   display: flex;
   gap: 8px;
 }
 
 .chat-input {
   flex: 1;
-  padding: 9px 12px;
+  padding: 11px 14px;
   background: var(--surface2);
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -560,178 +397,141 @@ body {
   font-family: var(--sans);
   font-size: 13px;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color .2s;
 }
 
-.chat-input:focus { border-color: rgba(200,165,94,0.4); }
-.chat-input::placeholder { color: var(--muted2); }
+.chat-input:focus { border-color: var(--accent); }
+.chat-input::placeholder { color: var(--muted); }
 
-.send-btn {
-  padding: 9px 16px;
-  background: var(--gold);
-  color: #0c0c0e;
+.btn-send {
+  padding: 11px 18px;
+  background: var(--accent);
+  color: var(--ink);
   border: none;
   border-radius: 8px;
   font-family: var(--sans);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: opacity .15s, transform .1s;
+  letter-spacing: .04em;
+  white-space: nowrap;
 }
 
-.send-btn:hover { opacity: 0.85; }
+.btn-send:hover  { opacity: .85; }
+.btn-send:active { transform: scale(.97); }
 
-/* ── Footer ── */
-.footer {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-  padding: 12px 16px;
-  background: var(--surface);
+/* ── Log entries ── */
+.log {
+  background: var(--surface2);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 8px;
+  padding: 14px;
+  max-height: 130px;
+  overflow-y: auto;
 }
 
-.footer-item {
+.log::-webkit-scrollbar { width: 3px; }
+.log::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.log-entry {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  animation: fadeUp .2s ease;
 }
 
-.footer-val {
-  font-family: var(--mono);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-}
+.log-entry:last-child { border-bottom: none; }
 
-.footer-lbl {
-  font-size: 10px;
+.log-time {
+  font-family: var(--sans);
+  font-weight: 600;
   color: var(--muted);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.log-text { color: var(--text); }
+
+.log-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 /* ── Responsive ── */
-@media (max-width: 960px) {
-  .main { grid-template-columns: 1fr; }
-  .sensor-strip { grid-template-columns: repeat(2,1fr); }
-  .footer { grid-template-columns: repeat(2,1fr); }
+@media (max-width: 900px) {
+  .grid { grid-template-columns: 1fr; }
+  .right-col { flex-direction: column; }
 }
 
 </style>
 </head>
 <body>
 
-<div class="layout">
+<div class="container">
 
-  <!-- ── Header ── -->
-  <header class="header">
-    <div class="brand">
-      <div class="brand-icon">🛡️</div>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="3"/>
+          <circle cx="14" cy="12" r="2"/>
+          <path d="M3 12h9"/>
+        </svg>
+      </div>
       <div>
-        <div class="brand-name">Rakshyam</div>
-        <div class="brand-sub">AI-Powered Security &amp; Access Control</div>
+        <h1>DOOR CONTROL</h1>
+        <p>AI-Powered Security & Access System</p>
       </div>
     </div>
-    <div class="header-right">
-      <div class="chip chip-live">
-        <span class="dot dot-pulse"></span>
-        LIVE
-      </div>
-      <div class="chip chip-wifi" id="wifi-chip">
-        <span class="dot"></span>
-        <span id="wifi-label">Connecting…</span>
-      </div>
-      <a href="/logout" class="logout-btn">Log out</a>
+    <div class="live-badge">
+      <span class="live-dot"></span>
+      LIVE
     </div>
-  </header>
+  </div>
 
-  <!-- ── Main ── -->
-  <div class="main">
+  <!-- Main grid -->
+  <div class="grid">
 
-    <!-- Left column -->
-    <div class="left-col">
+    <!-- Left: video + controls -->
+    <div class="card">
+      <div class="card-title">Live Video Feed</div>
 
-      <!-- Video -->
-      <div class="card video-card">
-        <div class="video-wrap">
-          <img src="{{ url_for('video_feed') }}" alt="Live camera feed">
-          <div class="video-hud">
-            <div class="hud-corner tl"></div>
-            <div class="hud-corner tr"></div>
-            <div class="hud-corner bl"></div>
-            <div class="hud-corner br"></div>
-            <span class="hud-label">CAM-01 · ENTRANCE</span>
-            <span class="hud-rec">
-              <span class="dot dot-pulse" style="background:var(--red)"></span>
-              REC
-            </span>
-          </div>
-        </div>
-        <div class="video-footer">
-          <div class="door-status-row">
-            <span class="door-status-label">DOOR</span>
-            <div class="door-badge closed" id="door-badge">
-              <span class="dot" id="door-dot"></span>
-              <span id="door-text">LOCKED</span>
-            </div>
-          </div>
-          <div class="btn-row">
-            <button class="btn btn-unlock" onclick="openDoor()">
-              &#x1F513; Unlock
-            </button>
-            <button class="btn btn-lock" onclick="closeDoor()">
-              &#x1F512; Lock
-            </button>
-          </div>
+      <div class="video-wrap">
+        <img src="{{ url_for('video_feed') }}" alt="Live feed">
+        <div class="video-overlay">
+          <div class="corner corner-tl"></div>
+          <div class="corner corner-tr"></div>
+          <div class="corner corner-bl"></div>
+          <div class="corner corner-br"></div>
+          <span class="video-label">CAM-01 · ENTRANCE</span>
         </div>
       </div>
 
-      <!-- Sensor strip -->
-      <div class="sensor-strip">
-
-        <!-- Temperature -->
-        <div class="sensor-tile">
-          <div class="sensor-icon">🌡️</div>
-          <div class="sensor-val" id="temp-val">--</div>
-          <div class="sensor-unit">°C</div>
-          <div class="sensor-lbl">Temperature</div>
+      <div class="status-bar">
+        <span class="status-label">DOOR STATUS</span>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="status-value closed" id="door-status-text">CLOSED</span>
+          <span class="status-indicator closed" id="door-indicator"></span>
         </div>
-
-        <!-- Humidity -->
-        <div class="sensor-tile">
-          <div class="sensor-icon">💧</div>
-          <div class="sensor-val" id="hum-val">--</div>
-          <div class="sensor-unit">%</div>
-          <div class="sensor-lbl">Humidity</div>
-        </div>
-
-        <!-- Motion -->
-        <div class="sensor-tile">
-          <div class="sensor-icon">🔍</div>
-          <div class="sensor-val" id="motion-val" style="color:var(--muted2)">IDLE</div>
-          <div class="sensor-unit">&nbsp;</div>
-          <div class="sensor-lbl">PIR Motion</div>
-        </div>
-
-        <!-- Bulb / room light control -->
-        <div class="sensor-tile bulb-tile off" id="bulb-tile">
-          <div class="sensor-icon" id="bulb-icon">💡</div>
-          <div class="sensor-val" id="bulb-val">OFF</div>
-          <div class="sensor-unit">&nbsp;</div>
-          <div class="sensor-lbl">Room light</div>
-          <div class="bulb-btn-row">
-            <button class="btn btn-sm btn-bulb-on" id="bulb-on-btn" onclick="turnBulbOn()">
-              ON
-            </button>
-            <button class="btn btn-sm btn-bulb-off" id="bulb-off-btn" onclick="turnBulbOff()" >
-              OFF
-            </button>
-          </div>
-        </div>
-
       </div>
 
+      <div class="btn-row">
+        <button class="btn btn-open" onclick="openDoor()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          OPEN
+        </button>
+        <button class="btn btn-close" onclick="closeDoor()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          CLOSE
+        </button>
+      </div>
     </div>
 
     <!-- Right column -->
@@ -739,420 +539,233 @@ body {
 
       <!-- Stats -->
       <div class="card">
-        <div class="card-label">Statistics</div>
-        <div class="stats-row">
-          <div class="stat-tile">
+        <div class="card-title">System Stats</div>
+        <div class="stats-grid">
+          <div class="stat">
             <div class="stat-val" id="stat-events">0</div>
-            <div class="stat-lbl">Door events</div>
+            <div class="stat-lbl">Door Events</div>
           </div>
-          <div class="stat-tile">
+          <div class="stat">
             <div class="stat-val" id="stat-uptime">00:00</div>
             <div class="stat-lbl">Uptime</div>
           </div>
-          <div class="stat-tile">
-            <div class="stat-val" id="stat-motion">0</div>
-            <div class="stat-lbl">Motion alerts</div>
-          </div>
-          <div class="stat-tile">
+          <div class="stat">
             <div class="stat-val" id="stat-msgs">0</div>
             <div class="stat-lbl">Messages</div>
+          </div>
+          <div class="stat">
+            <div class="stat-val" style="color:var(--green)">ON</div>
+            <div class="stat-lbl">AI Status</div>
           </div>
         </div>
       </div>
 
       <!-- Activity log -->
       <div class="card">
-        <div class="card-label">Activity log</div>
-        <div class="log-scroll" id="activity-log">
-          <div class="log-row">
-            <span class="log-dot" style="background:var(--gold)"></span>
-            <span class="log-time" id="init-ts">--:--:--</span>
-            <span class="log-text">System initialised</span>
+        <div class="card-title">Activity Log</div>
+        <div class="log" id="activity-log">
+          <div class="log-entry">
+            <span class="log-dot" style="background:var(--accent)"></span>
+            <span class="log-time" id="init-time">--:--:--</span>
+            <span class="log-text">System initialized</span>
           </div>
         </div>
       </div>
 
       <!-- Chat -->
       <div class="card chat-card">
-        <div class="card-label">Live chat</div>
-        <div class="chat-msgs" id="chat-box">
-          <div class="msg msg-sys">
-            Welcome to Rakshyam. All sensor data is live from the ESP32.
-            <div class="msg-meta">System</div>
+        <div class="card-title">Live Chat</div>
+        <div class="chat-messages" id="chat-box">
+          <div class="msg msg-system">
+            Welcome to the smart security system. How can I help?
+            <div class="msg-time">System</div>
           </div>
         </div>
-        <div class="chat-row">
-          <input class="chat-input" type="text" id="chat-input" placeholder="Type a message…" autocomplete="off">
-          <button class="send-btn" onclick="sendChat()">Send</button>
+        <div class="chat-input-row">
+          <input
+            class="chat-input"
+            type="text"
+            id="chat-message"
+            placeholder="Type a message..."
+            autocomplete="off"
+          >
+          <button class="btn-send" onclick="sendMessage()">SEND</button>
         </div>
       </div>
 
     </div>
   </div>
-
-  <!-- ── Footer status bar ── -->
-  <footer class="footer">
-    <div class="footer-item">
-      <span class="footer-val" id="footer-ip">192.168.1.81</span>
-      <span class="footer-lbl">NodeMCU IP</span>
-    </div>
-    <div class="footer-item">
-      <span class="footer-val" id="footer-temp">-- °C</span>
-      <span class="footer-lbl">Temperature</span>
-    </div>
-    <div class="footer-item">
-      <span class="footer-val" id="footer-hum">-- %</span>
-      <span class="footer-lbl">Humidity</span>
-    </div>
-    <div class="footer-item">
-      <span class="footer-val" id="footer-door">--</span>
-      <span class="footer-lbl">Door state</span>
-    </div>
-    <div class="footer-item">
-      <span class="footer-val" id="footer-bulb">OFF</span>
-      <span class="footer-lbl">Room light</span>
-    </div>
-  </footer>
-
 </div>
 
 <script>
   const USERNAME = {{ username|tojson }};
-
-  // ── SocketIO ──
   const socket = window.io ? io() : null;
 
-  // ── Counters ──
-  let doorEvents   = 0;
-  let motionAlerts = 0;
-  let msgCount     = 0;
-  let startTime    = Date.now();
-  let bulbOn       = false;
+  let doorEvents = 0;
+  let messageCount = 0;
+  let startTime = Date.now();
 
-  // ── Uptime ──
+  // ── Uptime counter ──
   setInterval(() => {
-    const totalSec = Math.floor((Date.now() - startTime) / 1000);
-    const h = Math.floor(totalSec / 3600);
-    const m = Math.floor((totalSec % 3600) / 60);
-    const s = totalSec % 60;
-    document.getElementById('stat-uptime').textContent =
+    const s = Math.floor((Date.now() - startTime) / 1000);
+    const m = Math.floor(s / 60);
+    const h = Math.floor(m / 60);
+    document.getElementById("stat-uptime").textContent =
       h > 0
-        ? `${pad(h)}:${pad(m)}:${pad(s)}`
-        : `${pad(m)}:${pad(s)}`;
+        ? `${String(h).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`
+        : `${String(m).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
   }, 1000);
 
+  // ── Set init time ──
   window.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('init-ts').textContent = nowTime();
-    fetchStatus();            // immediate first poll
-    fetchDHT();
-    setInterval(fetchStatus, 5000);   // poll ESP32 status every 5 s
-    setInterval(fetchDHT,    4000);   // poll DHT every 4 s
+    document.getElementById("init-time").textContent = nowTime();
+    addLog("System ready", "var(--accent)");
   });
 
-  // ── Helpers ──
-  function pad(n) { return String(n).padStart(2, '0'); }
+  if (socket) {
+    socket.on("message", data => {
+      appendMessage(data.message, data.type === "user" ? "user" : "system", data.username || "System");
+      messageCount++;
+      document.getElementById("stat-msgs").textContent = messageCount;
+    });
+
+    socket.on("door-event", data => {
+      if (data.status === "open") {
+        setDoorStatus(true);
+        bumpDoorEvents();
+        addLog(data.message || "Door opened", "var(--green)");
+      } else if (data.status === "closed") {
+        setDoorStatus(false);
+        bumpDoorEvents();
+        addLog(data.message || "Door closed", "var(--red)");
+      } else {
+        addLog(data.message || "Door action failed", "var(--red)");
+      }
+    });
+
+    socket.on("security-alert", data => {
+      addLog(data.message || "Security alert", "var(--red)");
+    });
+
+    socket.on("attendance-event", data => {
+      const color = data.Status === "Known" ? "var(--green)" : "var(--red)";
+      addLog(`${data.Name} marked ${data.Status}`, color);
+    });
+  }
+
   function nowTime() {
     return new Date().toLocaleTimeString('en-US', { hour12: false });
   }
 
-  function addLog(text, color) {
-    const log   = document.getElementById('activity-log');
-    const row   = document.createElement('div');
-    const dot   = document.createElement('span');
-    const ts    = document.createElement('span');
-    const label = document.createElement('span');
+  // ── Door control ──
+  function setDoorStatus(isOpen) {
+    const text = document.getElementById("door-status-text");
+    const dot  = document.getElementById("door-indicator");
+    if (isOpen) {
+      text.textContent = "OPEN";
+      text.className = "status-value open";
+      dot.className  = "status-indicator open";
+    } else {
+      text.textContent = "CLOSED";
+      text.className = "status-value closed";
+      dot.className  = "status-indicator closed";
+    }
+  }
 
-    row.className   = 'log-row';
-    dot.className   = 'log-dot';
-    dot.style.background = color || 'var(--gold)';
-    ts.className    = 'log-time';
-    ts.textContent  = nowTime();
-    label.className = 'log-text';
+  function bumpDoorEvents() {
+    doorEvents++;
+    document.getElementById("stat-events").textContent = doorEvents;
+  }
+
+  async function sendDoorRequest(url, isOpen, successText) {
+    try {
+      const response = await fetch(url);
+      let data = {};
+      try {
+        data = await response.json();
+      } catch (e) {
+        data = {};
+      }
+
+      if (!response.ok || data.ok === false) {
+        throw new Error(data.detail || data.status || "Request failed");
+      }
+
+      if (!socket || !socket.connected) {
+        setDoorStatus(isOpen);
+        bumpDoorEvents();
+        addLog(successText, isOpen ? "var(--green)" : "var(--red)");
+      }
+    } catch (error) {
+      addLog(`${successText} failed`, "var(--red)");
+    }
+  }
+
+  function openDoor() {
+    sendDoorRequest("/open_door", true, "Door opened");
+  }
+
+  function closeDoor() {
+    sendDoorRequest("/close_door", false, "Door closed");
+  }
+
+  // ── Activity log ──
+  function addLog(text, color) {
+    const log = document.getElementById("activity-log");
+    const entry = document.createElement("div");
+    const dot = document.createElement("span");
+    const time = document.createElement("span");
+    const label = document.createElement("span");
+
+    entry.className = "log-entry";
+    dot.className = "log-dot";
+    dot.style.background = color;
+    time.className = "log-time";
+    time.textContent = nowTime();
+    label.className = "log-text";
     label.textContent = text;
 
-    row.appendChild(dot);
-    row.appendChild(ts);
-    row.appendChild(label);
-    log.appendChild(row);
+    entry.appendChild(dot);
+    entry.appendChild(time);
+    entry.appendChild(label);
+    log.appendChild(entry);
     log.scrollTop = log.scrollHeight;
-
-    // keep log from growing unbounded
-    while (log.children.length > 60) {
-      log.removeChild(log.firstChild);
-    }
-  }
-
-  // ── Door status ──
-  function setDoor(isOpen) {
-    const badge = document.getElementById('door-badge');
-    const text  = document.getElementById('door-text');
-    const dot   = document.getElementById('door-dot');
-    const footer = document.getElementById('footer-door');
-
-    if (isOpen) {
-      badge.className = 'door-badge open';
-      dot.style.background = 'var(--green)';
-      text.textContent = 'OPEN';
-      footer.textContent = 'OPEN';
-      footer.style.color = 'var(--green)';
-    } else {
-      badge.className = 'door-badge closed';
-      dot.style.background = 'var(--red)';
-      text.textContent = 'LOCKED';
-      footer.textContent = 'LOCKED';
-      footer.style.color = 'var(--red)';
-    }
-    doorEvents++;
-    document.getElementById('stat-events').textContent = doorEvents;
-  }
-
-  // ── WiFi chip ──
-  function setWifi(online) {
-    const chip  = document.getElementById('wifi-chip');
-    const label = document.getElementById('wifi-label');
-    if (online) {
-      chip.className = 'chip chip-wifi';
-      label.textContent = 'ESP32 Online';
-    } else {
-      chip.className = 'chip chip-offline';
-      label.textContent = 'ESP32 Offline';
-    }
-  }
-
-  // ── Fetch /status from Flask (which relays to ESP32) ──
-  async function fetchStatus() {
-    try {
-      const res  = await fetch('/status');
-      const data = await res.json();
-
-      const st = data.status || {};
-
-      // Detect offline
-      if (st.warning) {
-        setWifi(false);
-        return;
-      }
-
-      setWifi(true);
-
-      // Parse ESP32 plain-text response like:
-      //   Door: OPEN\nBulb: ON\nTemperature: 27.5 C\nHumidity: 55.0 %
-      const raw = st.nodemcu && st.nodemcu.raw ? st.nodemcu.raw : '';
-      if (raw) {
-        parseStatusText(raw);
-      }
-
-    } catch (e) {
-      setWifi(false);
-    }
-  }
-
-  function parseStatusText(raw) {
-    const lines = raw.split('\n');
-    lines.forEach(line => {
-      const lower = line.toLowerCase();
-
-      if (lower.includes('door:')) {
-        const isOpen = lower.includes('open');
-        const currentText = document.getElementById('door-text').textContent;
-        const wasOpen = currentText === 'OPEN';
-        if (isOpen !== wasOpen) {
-          setDoor(isOpen);
-          addLog(isOpen ? 'Door opened (ESP32)' : 'Door locked (ESP32)',
-                 isOpen ? 'var(--green)' : 'var(--red)');
-        }
-      }
-
-      if (lower.includes('bulb:')) {
-        const isOn = lower.includes('on');
-        updateBulbUI(isOn);
-      }
-
-      if (lower.includes('temperature:')) {
-        const match = line.match(/([\d.]+)/);
-        if (match) {
-          const val = parseFloat(match[1]).toFixed(1);
-          document.getElementById('temp-val').textContent   = val;
-          document.getElementById('footer-temp').textContent = val + ' °C';
-        }
-      }
-
-      if (lower.includes('humidity:')) {
-        const match = line.match(/([\d.]+)/);
-        if (match) {
-          const val = parseFloat(match[1]).toFixed(1);
-          document.getElementById('hum-val').textContent   = val;
-          document.getElementById('footer-hum').textContent = val + ' %';
-        }
-      }
-    });
-  }
-
-  // ── Fetch DHT separately (also hits /status) ──
-  async function fetchDHT() {
-    try {
-      const res  = await fetch('http://192.168.43.19/dht');     // custom Flask route below
-      const data = await res.json();
-      if (data.temperature !== undefined) {
-        const t = parseFloat(data.temperature).toFixed(1);
-        const h = parseFloat(data.humidity).toFixed(1);
-        document.getElementById('temp-val').textContent    = t;
-        document.getElementById('hum-val').textContent     = h;
-        document.getElementById('footer-temp').textContent = t + ' °C';
-        document.getElementById('footer-hum').textContent  = h + ' %';
-      }
-    } catch (_) {}
-  }
-
-  // ── Motion flash ──
-  function flashMotion() {
-    const el = document.getElementById('motion-val');
-    el.textContent = 'MOTION';
-    el.style.color = 'var(--amber)';
-    motionAlerts++;
-    document.getElementById('stat-motion').textContent = motionAlerts;
-    addLog('Motion detected by PIR sensor', 'var(--amber)');
-    setTimeout(() => {
-      el.textContent = 'IDLE';
-      el.style.color = 'var(--muted2)';
-    }, 3000);
-  }
-
-  // ── Bulb / room light UI ──
-  function updateBulbUI(isOn) {
-    bulbOn = isOn;
-    const tile   = document.getElementById('bulb-tile');
-    const val    = document.getElementById('bulb-val');
-    const onBtn  = document.getElementById('bulb-on-btn');
-    const offBtn = document.getElementById('bulb-off-btn');
-    const footer = document.getElementById('footer-bulb');
-
-    tile.className = isOn ? 'sensor-tile bulb-tile on' : 'sensor-tile bulb-tile off';
-    val.textContent = isOn ? 'ON' : 'OFF';
-    footer.textContent = isOn ? 'ON' : 'OFF';
-    footer.style.color = isOn ? 'var(--amber)' : 'var(--text)';
-
-    // Disable whichever button matches the current state
-
-  }
-
-  async function setBulb(turnOn) {
-    const endpoint = turnOn ? 'http://192.168.43.19/bulboff' : 'http://192.168.43.19/bulbon';
-    try {
-      const res  = await fetch(endpoint);
-      const text = await res.text();
-      const isOn = text.toUpperCase().includes('ON') && !text.toUpperCase().includes('OFF');
-      updateBulbUI(isOn);
-      addLog(`Room light turned ${isOn ? 'ON' : 'OFF'}`, 'var(--amber)');
-    } catch (e) {
-      addLog('Light command failed', 'var(--red)');
-    }
-  }
-
-  function turnBulbOn()  { setBulb(true); }
-  function turnBulbOff() { setBulb(false); }
-
-  // ── Door commands ──
-  async function openDoor() {
-    try {
-      const res  = await fetch('/open');
-      const data = await res.json();
-      if (data.ok === false) {
-        addLog('Unlock cooldown – ' + (data.detail || 'try again'), 'var(--muted)');
-        return;
-      }
-    } catch (_) {}
-    // Optimistic UI — SocketIO event will confirm
-    addLog('Unlock command sent', 'var(--gold)');
-  }
-
-  async function closeDoor() {
-    try {
-      const res  = await fetch('/close_door');
-      const data = await res.json();
-      if (data.ok === false) {
-        addLog('Lock cooldown – ' + (data.detail || 'try again'), 'var(--muted)');
-        return;
-      }
-    } catch (_) {}
-    addLog('Lock command sent', 'var(--gold)');
-  }
-
-  // ── SocketIO events ──
-  if (socket) {
-    socket.on('door-event', data => {
-      if (data.status === 'open') {
-        setDoor(true);
-        addLog(data.message || 'Door opened', 'var(--green)');
-      } else if (data.status === 'closed') {
-        setDoor(false);
-        addLog(data.message || 'Door locked', 'var(--red)');
-      } else if (data.status === 'error') {
-        addLog('Door error: ' + (data.message || 'unknown'), 'var(--red)');
-      }
-    });
-
-    socket.on('attendance-event', data => {
-      const color = data.Status === 'Known' ? 'var(--green)' : 'var(--red)';
-      addLog(`${data.Name} — ${data.Status}`, color);
-    });
-
-    socket.on('security-alert', data => {
-      addLog(data.message || 'Security alert', 'var(--red)');
-      flashMotion();
-    });
-
-    socket.on('message', data => {
-      appendChat(data.message, data.type === 'user' ? 'user' : 'sys',
-                 data.username || 'System');
-      msgCount++;
-      document.getElementById('stat-msgs').textContent = msgCount;
-    });
-
-    socket.on('pir-motion', () => flashMotion());
-
-    // Optional: if your Flask/ESP32 side emits a bulb event, this keeps
-    // the UI in sync even if the light was toggled from elsewhere
-    // (e.g. another browser tab, a schedule, or a voice command).
-    socket.on('bulb-event', data => {
-      const isOn = data.status === 'on';
-      updateBulbUI(isOn);
-      addLog(data.message || `Room light turned ${isOn ? 'ON' : 'OFF'}`, 'var(--amber)');
-    });
   }
 
   // ── Chat ──
-  function appendChat(text, type, sender) {
-    const box  = document.getElementById('chat-box');
-    const div  = document.createElement('div');
-    const meta = document.createElement('div');
+  function sendMessage() {
+    const input = document.getElementById("chat-message");
+    const msg   = input.value.trim();
+    if (!msg) return;
 
-    div.className = type === 'user' ? 'msg msg-user' : 'msg msg-sys';
+    input.value = "";
+    if (socket && socket.connected) {
+      socket.emit("user-message", { message: msg, username: USERNAME });
+    } else {
+      appendMessage(msg, "user", "You");
+      messageCount++;
+      document.getElementById("stat-msgs").textContent = messageCount;
+    }
+    addLog(`Message: "${msg.slice(0,30)}${msg.length>30?'...':''}"`, "var(--accent)");
+  }
+
+  function appendMessage(text, type, sender) {
+    const box = document.getElementById("chat-box");
+    const div = document.createElement("div");
+    const meta = document.createElement("div");
+
+    div.className = type === "user" ? "msg msg-user" : "msg msg-system";
     div.appendChild(document.createTextNode(text));
-    meta.className = 'msg-meta';
-    meta.textContent = `${sender} · ${nowTime()}`;
+    meta.className = "msg-time";
+    meta.textContent = `${sender || (type === "user" ? "You" : "System")} - ${nowTime()}`;
     div.appendChild(meta);
     box.appendChild(div);
     box.scrollTop = box.scrollHeight;
   }
 
-  function sendChat() {
-    const input = document.getElementById('chat-input');
-    const msg   = input.value.trim();
-    if (!msg) return;
-    input.value = '';
-    if (socket && socket.connected) {
-      socket.emit('user-message', { message: msg, username: USERNAME });
-    } else {
-      appendChat(msg, 'user', 'You');
-      msgCount++;
-      document.getElementById('stat-msgs').textContent = msgCount;
-    }
-    addLog(`Message: "${msg.slice(0, 28)}${msg.length > 28 ? '…' : ''}"`, 'var(--gold)');
-  }
-
-  document.getElementById('chat-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter') sendChat();
+  // Enter key to send
+  document.getElementById("chat-message").addEventListener("keydown", e => {
+    if (e.key === "Enter") sendMessage();
   });
 </script>
 
